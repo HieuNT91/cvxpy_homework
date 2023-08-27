@@ -28,15 +28,10 @@ def test(pairwise_dists, verbose=True):
     for i in range(N-1):
         for j in range(i+1, N):
             constraints.append(sigmas[i] + sigmas[j] >= pairwise_dists[i, j])
-
-    # obj = 0
-    # for i in range(N):
-    #     obj += sigmas[i] ** 2 
     obj = cp.Minimize(cp.sum_squares(sigmas))
     prob = cp.Problem(obj, constraints)
     print("Solving with MOSEK...")
     prob.solve('MOSEK', verbose=verbose)
-    print("L=", pairwise_dists)
     print("sigma=", sigmas.value)
     return sigmas.value
 
@@ -49,18 +44,10 @@ def test_vectorised(pairwise_dists, verbose=True):
     constraints = [sigmas >= 1e-8]
     for i in range(N-1):
         constraints.append(sigmas[i] + sigmas[i+1:] >= pairwise_dists[i, i+1:])
-    #     for j in range(i+1, N):
-    #         constraints.append(sigmas[i] + sigmas[j] >= pairwise_dists[i, j])
-    
-
-    # obj = 0
-    # for i in range(N):
-    #     obj += sigmas[i] ** 2 
     obj = cp.Minimize(cp.sum_squares(sigmas))
     prob = cp.Problem(obj, constraints)
     print("Solving with MOSEK...")
     prob.solve('MOSEK', verbose=verbose)
-    print("L=", pairwise_dists)
     print("sigma=", sigmas.value)
     return sigmas.value
 
@@ -68,11 +55,9 @@ def test_vectorised(pairwise_dists, verbose=True):
 if __name__ == "__main__":
 
     np.random.seed(3)
-    # N = 50000
-    # d = 32*32*3
-    Z = np.load('small_noises.npy').reshape(200, -1)
-    # Z = Z[:200, :20]
-    # np.save('small_noises.npy', Z)
+    ## Uncomment to solve a small problem
+    #Z = np.load('small_noises.npy').reshape(200, -1)
+    Z = np.load('noises.npy').reshape(50000, -1)
     weight = 1
     pairwise_dists = weight * pairwise_distances(Z)
     print('Shape of pairwise_dists:', pairwise_dists.shape)
