@@ -42,7 +42,8 @@ def test_vectorised(pairwise_dists, verbose=True):
 
     constraints = [sigmas >= 1e-8]
     for i in range(N-1):
-        constraints.append(sigmas[i] + sigmas[i+1:] >= pairwise_dists[i, i+1:])
+        if (pairwise_dists[i, i+1:] < 65).sum() > 0:
+            constraints.append(sigmas[i] + sigmas[i+1:] >= pairwise_dists[i, i+1:])
     obj = cp.Minimize(cp.sum_squares(sigmas))
     prob = cp.Problem(obj, constraints)
     print("Solving with MOSEK...")
